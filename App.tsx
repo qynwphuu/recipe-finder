@@ -10,31 +10,39 @@ import {
   TextInput,
   FlatList,
   Image,
+  ActivityIndicator,
 } from "react-native";
 
+// Must be the same with API names
 type Foods = {
-  name: string;
-  image: string;
+  strMeal: string;
+  strMealThumb: string;
+  idMeal: string;
 };
-
-const handleFetch = () => {
-  fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${keyword}`)
-    .then((response) => {
-      if (!response.ok) throw new Error("Error in fetch" + response.statusText);
-
-      response.json();
-    })
-    .then((data) => setFoodNames(data.items))
-    .catch((err) => console.error(err));
-};
-
-const [keyword, setKeyword] = useState("");
-const [foodNames, setFoodNames] = useState<Foods[]>([]);
 
 export default function App() {
+  const [keyword, setKeyword] = useState("");
+  const [foodNames, setFoodNames] = useState<Foods[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const handleFetch = () => {
+    setLoading(true);
+
+    fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${keyword}`)
+      .then((response) => {
+        if (!response.ok)
+          throw new Error("Error in fetch" + response.statusText);
+        return response.json();
+      })
+      // Get the meals from the API
+      .then((data) => setFoodNames(data.meals || []))
+      .catch((err) => console.error(err))
+      .finally(() => setLoading(false));
+  };
+
   return (
-    <SafeAreaView>
-      <SafeAreaProvider style={styles.container}>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container}>
         <TextInput
           style={{ fontSize: 18, width: 200 }}
           placeholder="Enter a keyword"
@@ -44,23 +52,27 @@ export default function App() {
 
         <Button title="Find" onPress={handleFetch} />
 
-        <FlatList
-          data={foodNames}
-          renderItem={({ item }) => (
-            <View>
-              <Text style={{ fontSize: 18 }}>{item.name}</Text>
-
-              <Image
-                style={{ width: 50, height: 50 }}
-                source={{
-                  uri: `https://www.themealdb.com/images/media/meals/se5vhk1764114880.jpg`,
-                }}
-              />
-            </View>
-          )}
-        />
-      </SafeAreaProvider>
-    </SafeAreaView>
+        {loading ? (
+          <ActivityIndicator size="large" />
+        ) : (
+          <FlatList
+            style={{ margin: 20 }}
+            data={foodNames}
+            renderItem={({ item }) => (
+              <View style={{ marginBottom: 5 }}>
+                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
+                  {item.strMeal}
+                </Text>
+                <Image
+                  style={{ width: 50, height: 50 }}
+                  source={{ uri: "URL HERE" }}
+                />
+              </View>
+            )}
+          />
+        )}
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
