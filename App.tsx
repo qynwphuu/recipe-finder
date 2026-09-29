@@ -44,7 +44,15 @@ export default function App() {
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
         <TextInput
-          style={{ fontSize: 18, width: 200 }}
+          style={{
+            fontSize: 18,
+            width: 200,
+            alignItems: "center",
+            marginTop: 0,
+            marginBottom: 10,
+            borderWidth: 1,
+            borderColor: "#ccc",
+          }}
           placeholder="Enter a keyword"
           value={keyword}
           onChangeText={(text) => setKeyword(text)}
@@ -56,16 +64,15 @@ export default function App() {
           <ActivityIndicator size="large" />
         ) : (
           <FlatList
-            style={{ margin: 20 }}
+            style={styles.imagesContainer}
             data={foodNames}
+            keyExtractor={(item) => item.idMeal}
             renderItem={({ item }) => (
-              <View style={{ marginBottom: 5 }}>
-                <Text style={{ fontSize: 18, fontWeight: "bold" }}>
-                  {item.strMeal}
-                </Text>
+              <View style={styles.itemContainer}>
+                <Text>{item.strMeal}</Text>
                 <Image
-                  style={{ width: 50, height: 50 }}
-                  source={{ uri: "URL HERE" }}
+                  source={{ uri: item.strMealThumb }}
+                  style={{ width: 60, height: 60, borderRadius: 8 }}
                 />
               </View>
             )}
@@ -81,6 +88,32 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
+    paddingTop: 40,
+  },
+
+  imagesContainer: {
+    flex: 1,
+    marginTop: 20,
+    width: "80%",
+  },
+
+  itemContainer: {
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e0e0e0",
+  },
+
+  recipeItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+
+  recipeTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    flex: 1,
+    marginRight: 10,
   },
 });
